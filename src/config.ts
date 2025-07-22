@@ -17,5 +17,6 @@ export const API_ENDPOINTS = {
   ADMIN_USER_TEAM: `${API_BASE_URL}/api/admin/user_team`,
   PLAYER_LEADERBOARD: `${API_BASE_URL}/api/team/players/leaderboard`,
   TEAM_DETAILS: `${API_BASE_URL}/api/team/teams`,
-  PLAYER_STATS: `${API_BASE_URL}/api/team/players`
+  PLAYER_STATS: `${API_BASE_URL}/api/team/players`,
+  NEWS: `${API_BASE_URL}/api/admin/news`,
 } as const; 

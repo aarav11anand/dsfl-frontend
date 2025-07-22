@@ -196,33 +196,6 @@ const MyTeamPlayers: React.FC = () => {
     setAssignedPlayers(newAssignedPlayers);
   }, [selectedFormation, selectedPlayers]);
 
-  const handleSelectPlayer = (player: Player) => {
-    setSelectedPlayers(prevSelected => {
-      const isSelected = prevSelected.some(p => p.id === player.id);
-      if (isSelected) {
-        // Player is already selected, remove them
-        // Also, if this player was the captain, deselect captain
-        if (captainId === player.id) {
-          setCaptainId(null);
-        }
-        // Also, if this player is assigned to a slot, unassign them
-        setAssignedPlayers(prevAssigned => {
-          const newAssigned = { ...prevAssigned };
-          for (const key in newAssigned) {
-            if (newAssigned[key] && newAssigned[key]!.id === player.id) {
-              newAssigned[key] = null;
-            }
-          }
-          return newAssigned;
-        });
-        return prevSelected.filter(p => p.id !== player.id);
-      } else {
-        // Player is not selected, add them
-        return [...prevSelected, player];
-      }
-    });
-  };
-
   const handleAssignPlayer = (slotId: string, player: Player | null) => {
     setAssignedPlayers(prevAssigned => {
       const newAssigned = { ...prevAssigned };
@@ -275,15 +248,48 @@ const MyTeamPlayers: React.FC = () => {
     setCaptainId(playerId);
   };
 
+  // Parse price to number, handling both string and number inputs
+  const parsePrice = (price: string | number): number => {
+    if (typeof price === 'number') return price;
+    if (typeof price === 'string') return parseFloat(price) || 0;
+    return 0;
+  };
+
+  // Format currency helper function
+  const formatCurrency = (value: number | string) => {
+    // Ensure we have a valid number
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return '0.00';
+    
+    // Format as Indian Rupees with proper formatting
+    return new Intl.NumberFormat('en-IN', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(numValue);
+  };
+
   // Calculate total team price
   const totalTeamPrice = Object.values(assignedPlayers)
     .filter((player): player is Player => player !== null)
-    .reduce((total, player) => total + player.price, 0);
+    .reduce((total, player) => total + parsePrice(player.price), 0);
 
   // Get current assigned players for the modal
   const currentAssignedPlayers = Object.values(assignedPlayers).filter((player): player is Player => player !== null);
 
   const BUDGET = 100; // Define a fixed budget for now, can be dynamic later
+  
+  // Ensure player prices are properly parsed when setting state
+  useEffect(() => {
+    if (players.length > 0) {
+      setPlayers(prevPlayers => 
+        prevPlayers.map(player => ({
+          ...player,
+          price: parsePrice(player.price)
+        }))
+      );
+    }
+  }, [players.length]);
 
   const handleCreateTeam = async () => {
     // Validation checks
@@ -319,6 +325,7 @@ const MyTeamPlayers: React.FC = () => {
       }
 
       const teamData = {
+        name: 'My Fantasy Team', // Add default team name
         formation: selectedFormation,
         players: assignedPlayerIds.map(id => ({
           player_id: id,
@@ -339,9 +346,29 @@ const MyTeamPlayers: React.FC = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        console.error('Server error response:', errorData);
-        throw new Error(errorData?.message || `Server error: ${response.status}`);
+        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          console.error('Server error response:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData,
+            requestBody: teamData,
+            url: url
+          });
+          errorMessage = errorData.message || JSON.stringify(errorData) || errorMessage;
+        } catch (e) {
+          const errorText = await response.text();
+          console.error('Failed to parse error response:', {
+            status: response.status,
+            statusText: response.statusText,
+            responseText: errorText,
+            requestBody: teamData,
+            url: url
+          });
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -521,8 +548,8 @@ const MyTeamPlayers: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline">
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">₹{BUDGET - totalTeamPrice}</span>
-            <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">/ ₹{BUDGET}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">₹{formatCurrency(BUDGET - totalTeamPrice)}</span>
+            <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">/ ₹{formatCurrency(BUDGET)}</span>
           </div>
           <div className="mt-2">
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -536,7 +563,7 @@ const MyTeamPlayers: React.FC = () => {
               ></div>
             </div>
             <div className="flex justify-between mt-1 text-xs">
-              <span className="text-gray-500 dark:text-gray-400">Spent: ₹{totalTeamPrice}</span>
+              <span className="text-gray-500 dark:text-gray-400">Spent: ₹{formatCurrency(totalTeamPrice)}</span>
               <span className={`font-medium ${
                 totalTeamPrice > BUDGET 
                   ? 'text-red-600 dark:text-red-400' 
@@ -583,7 +610,7 @@ const MyTeamPlayers: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline">
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">₹{totalTeamPrice}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">₹{formatCurrency(totalTeamPrice)}</span>
             <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">Total Value</span>
           </div>
           <div className="mt-3">
