@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Player } from '../components/MyTeamPlayers'; // Assuming Player interface is exported
+import { Player } from '../components/MyTeamPlayers'; // Importing Player interface
 
 interface PlayerSelectionModalProps {
   isOpen: boolean;
@@ -128,7 +128,9 @@ const PlayerSelectionModal: React.FC<PlayerSelectionModalProps> = ({
                     {player.position} • <span className={getHouseColorClass(player.house || '')}>{player.house}</span>
                   </p>
                 </div>
-                <p className="text-gray-800 dark:text-white font-bold">₹{player.price.toLocaleString()}</p>
+                <p className="text-gray-800 dark:text-white font-bold">
+                  ₹{formatCurrency(player.price)}
+                </p>
               </div>
             ))
           ) : (
@@ -138,6 +140,17 @@ const PlayerSelectionModal: React.FC<PlayerSelectionModalProps> = ({
       </div>
     </div>
   );
+};
+
+// Format currency helper function
+const formatCurrency = (value: number | string) => {
+  const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+  // Format as Indian Rupees with proper formatting
+  return new Intl.NumberFormat('en-IN', {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  }).format(numValue);
 };
 
 const getHouseColorClass = (house: string) => {
