@@ -29,7 +29,7 @@ const News = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('/api/admin/news');
+        const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news');
         const data = await res.json();
         if (data.content) {
           setNews(JSON.parse(data.content));
