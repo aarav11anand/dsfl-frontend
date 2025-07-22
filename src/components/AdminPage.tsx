@@ -522,37 +522,39 @@ const AdminPage: React.FC = () => {
   const [newsMsg, setNewsMsg] = useState<string|null>(null);
   const [newsError, setNewsError] = useState<string|null>(null);
 
-  // Simulate fetch on mount (replace with real API call later)
-  useEffect(() => {
-    const fetchNews = async () => {
-      setNewsLoading(true);
-      setNewsError(null);
-      try {
-        const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news');
-        const data = await res.json();
-        if (data.content) {
-          const parsed = JSON.parse(data.content);
-          setNewsScout(parsed.scout || '');
-          setNewsDay(parsed.day || '');
-          setNewsTeam(parsed.team || '');
-          setNewsPlayer(parsed.player || '');
-          setNewsFixtures(parsed.fixtures || '');
-        }
-      } catch (e) {
-        setNewsError('Failed to load news content.');
-      } finally {
-        setNewsLoading(false);
+  // Function to fetch news content
+  const fetchNews = useCallback(async () => {
+    setNewsLoading(true);
+    setNewsError(null);
+    try {
+      const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news');
+      const data = await res.json();
+      if (data.content) {
+        const parsed = JSON.parse(data.content);
+        setNewsScout(parsed.scout || '');
+        setNewsDay(parsed.day || '');
+        setNewsTeam(parsed.team || '');
+        setNewsPlayer(parsed.player || '');
+        setNewsFixtures(parsed.fixtures || '');
       }
-    };
-    fetchNews();
+    } catch (e) {
+      setNewsError('Failed to load news content.');
+    } finally {
+      setNewsLoading(false);
+    }
   }, []);
+
+  // Fetch news on component mount
+  useEffect(() => {
+    fetchNews();
+  }, [fetchNews]);
 
   const handleSaveNews = async () => {
     setNewsLoading(true);
     setNewsMsg(null);
     setNewsError(null);
     try {
-      const res = await fetch('/api/admin/news', {
+      const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -566,10 +568,16 @@ const AdminPage: React.FC = () => {
           fixtures: newsFixtures
         })
       });
-      if (!res.ok) throw new Error('Failed to save');
-      setNewsMsg('News content saved!');
-    } catch (e) {
-      setNewsError('Failed to save news content.');
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to save news content');
+      }
+      setNewsMsg('News content saved successfully!');
+      // Refresh the news content after saving
+      fetchNews();
+    } catch (e: any) {
+      console.error('Error saving news:', e);
+      setNewsError(e.message || 'Failed to save news content. Please try again.');
     } finally {
       setNewsLoading(false);
     }
