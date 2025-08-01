@@ -1,4 +1,4 @@
-// Get API base URL from environment variable with fallback for development
+// Get API base URL from environment variable with fallback for production
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dsfl-backend-e3p8.onrender.com';
 
 export const API_ENDPOINTS = {
