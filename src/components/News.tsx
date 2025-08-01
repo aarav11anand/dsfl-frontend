@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PageTransition } from './PageTransition';
 import { motion } from 'framer-motion';
+import { API_ENDPOINTS } from '../config';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -29,7 +30,7 @@ const News = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news');
+        const res = await fetch(API_ENDPOINTS.NEWS);
         const data = await res.json();
         if (data.content) {
           setNews(JSON.parse(data.content));

@@ -335,9 +335,17 @@ const MyTeamPlayers: React.FC = () => {
 
       console.log('Sending team data:', teamData);
 
-      const url = userTeam ? `${API_ENDPOINTS.MY_TEAM}/${userTeam.id}` : API_ENDPOINTS.MY_TEAM;
+      // Always use the update endpoint with the team ID, even if it's a new team
+      let url = `${API_ENDPOINTS.MY_TEAM}`;
+      let method = 'POST';
+      
+      if (userTeam) {
+        // If we have a team, use the update endpoint
+        url = `${API_ENDPOINTS.MY_TEAM}/${userTeam.id}`;
+        method = 'PUT';
+      }
       const response = await fetch(url, {
-        method: userTeam ? 'PUT' : 'POST',
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`

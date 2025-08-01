@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import TeamUpdatesLock from './TeamUpdatesLock';
 import UserCard from './UserCard';
 import UserDetailModal from './UserDetailModal';
+import DirectPointsModal from './DirectPointsModal';
 
 interface LatestPerformance {
   goals: number;
@@ -270,8 +271,10 @@ const AdminPage: React.FC = () => {
   const [selectedUserTeam, setSelectedUserTeam] = useState<any | null>(null);
   const [userFilter, setUserFilter] = useState<'all' | 'students' | 'teachers'>('all');
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [directPointsModalOpen, setDirectPointsModalOpen] = useState(false);
+  const [selectedPlayerForDirectPoints, setSelectedPlayerForDirectPoints] = useState<Player | null>(null);
 
-  const [currentUser, setCurrentUser] = useState<any>(() => {
+  const [currentUser] = useState<any>(() => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return null;
@@ -397,11 +400,25 @@ const AdminPage: React.FC = () => {
       }
       alert('Player points reset successfully!');
       handleCloseModal();
+      fetchInitialData(); // Refresh the data
     } catch (err: any) {
       setError(err.message || 'Failed to reset player points.');
       console.error("Error resetting player points:", err);
-      throw err;
     }
+  };
+
+  const handleOpenDirectPointsModal = (player: Player) => {
+    setSelectedPlayerForDirectPoints(player);
+    setDirectPointsModalOpen(true);
+  };
+
+  const handleCloseDirectPointsModal = () => {
+    setDirectPointsModalOpen(false);
+    setSelectedPlayerForDirectPoints(null);
+  };
+
+  const handlePointsUpdated = () => {
+    fetchInitialData(); // Refresh the data
   };
 
   const handleCreateNewGame = async (name: string, date: string) => {
@@ -527,7 +544,7 @@ const AdminPage: React.FC = () => {
     setNewsLoading(true);
     setNewsError(null);
     try {
-      const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news');
+      const res = await fetch(API_ENDPOINTS.NEWS);
       const data = await res.json();
       if (data.content) {
         const parsed = JSON.parse(data.content);
@@ -554,7 +571,7 @@ const AdminPage: React.FC = () => {
     setNewsMsg(null);
     setNewsError(null);
     try {
-      const res = await fetch('https://dsfl-backend-e3p8.onrender.com/api/admin/news', {
+      const res = await fetch(API_ENDPOINTS.NEWS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -728,13 +745,18 @@ const AdminPage: React.FC = () => {
                   Latest: {player.latest_performance.goals}G {player.latest_performance.assists}A ({player.latest_performance.match_name})
                 </p>
               )}
+              <button
+                onClick={() => handleOpenDirectPointsModal(player)}
+                className="bg-orange-600 text-white px-3 py-2 rounded-md hover:bg-orange-700 transition-colors text-sm mt-2"
+              >
+                Update Points Directly
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Player Stats Entry Modal */}
-      {isModalOpen && selectedPlayerForModal && selectedGameId && (
+      {isModalOpen && selectedPlayerForModal && (
         <PlayerStatsModal
           player={selectedPlayerForModal}
           games={games}
@@ -744,6 +766,19 @@ const AdminPage: React.FC = () => {
           onResetPoints={handleResetPoints}
           onGameChange={setSelectedGameId}
           onCreateNewGame={handleCreateNewGame}
+          onError={handleError}
+        />
+      )}
+      
+      {directPointsModalOpen && selectedPlayerForDirectPoints && (
+        <DirectPointsModal
+          player={{
+            id: selectedPlayerForDirectPoints.id,
+            name: selectedPlayerForDirectPoints.name,
+            currentPoints: selectedPlayerForDirectPoints.total_points
+          }}
+          onClose={handleCloseDirectPointsModal}
+          onPointsUpdated={handlePointsUpdated}
           onError={handleError}
         />
       )}

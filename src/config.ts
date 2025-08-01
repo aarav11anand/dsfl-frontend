@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'https://dsfl-backend-e3p8.onrender.com';
+// Get API base URL from environment variable with fallback for development
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dsfl-backend-e3p8.onrender.com';
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/login`,
@@ -7,6 +8,7 @@ export const API_ENDPOINTS = {
   MY_TEAM: `${API_BASE_URL}/api/team/my_team`,
   ADMIN_PLAYERS: `${API_BASE_URL}/api/admin/players`,
   ADD_MATCH_PERFORMANCE: `${API_BASE_URL}/api/admin/add_match_performance`,
+  ADMIN_UPDATE_PLAYER_POINTS: `${API_BASE_URL}/api/admin/update_player_points`,
   ADMIN_GAMES: `${API_BASE_URL}/api/admin/games`,
   ADMIN_DELETE_GAME: `${API_BASE_URL}/api/admin/games`,
   ADMIN_RESET_PLAYER_POINTS: `${API_BASE_URL}/api/admin/reset_player_points`,
@@ -18,5 +20,5 @@ export const API_ENDPOINTS = {
   PLAYER_LEADERBOARD: `${API_BASE_URL}/api/team/players/leaderboard`,
   TEAM_DETAILS: `${API_BASE_URL}/api/team/teams`,
   PLAYER_STATS: `${API_BASE_URL}/api/team/players`,
-  NEWS: `${API_BASE_URL}/api/admin/news`,
-} as const; 
+  NEWS: `${API_BASE_URL}/api/admin/news`
+} as const;
