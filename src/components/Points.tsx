@@ -80,7 +80,7 @@ const Points = () => {
                 <table className="w-full">
                   <thead className="bg-gray-100 dark:bg-gray-700/50">
                     <tr>
-                      {['Game Played', 'Yellow Card', 'Red Card', 'Performance Bonus'].map((header, index) => (
+                      {['Game Played','Green Card', 'Yellow Card', 'Red Card', 'Performance Bonus'].map((header, index) => (
                         <th 
                           key={index}
                           className="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider"
@@ -94,6 +94,7 @@ const Points = () => {
                     <tr className="hover:bg-gray-700/30 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-green-400">+2</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-yellow-400">-1</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-pink-400">-2</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-red-400">-3</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-blue-400">+1/+2/+3</td>
                     </tr>
