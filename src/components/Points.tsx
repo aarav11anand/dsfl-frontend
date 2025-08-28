@@ -92,7 +92,8 @@ const Points = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     <tr className="hover:bg-gray-700/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-green-400">+2</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-blue-400">+1</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-green-400">-2</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-yellow-400">-1</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-pink-400">-2</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-red-400">-3</td>

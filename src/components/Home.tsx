@@ -72,7 +72,7 @@ const Home: React.FC = () => {
                 src="/ill.png"
                 alt="Sports Illustration"
                 className="absolute right-0 top-1/2 transform -translate-y-1/2 object-cover transition-transform duration-700 hover:scale-105"
-                style={{ width: '118.4625vw', height: '100vh' }} 
+                style={{ width: '110vw', height: '90vh' }} 
               />
             </motion.div>
           </div>
